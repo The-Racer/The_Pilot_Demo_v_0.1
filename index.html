@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Pilot - Racing Demo</title>
+    
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
+
+    <style>
+        /* Remove barras de rolagem e faz o jogo ocupar a tela toda */
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+        }
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none; /* Melhora o toque em telemóveis */
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="renderCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("renderCanvas");
+        const engine = new BABYLON.Engine(canvas, true);
+
+        const createScene = function () {
+            const scene = new BABYLON.Scene(engine);
+            
+            // Cor do céu (estilo noturno para combinar com o Cel Shading)
+            scene.clearColor = new BABYLON.Color4(0.05, 0.05, 0.1, 1);
+
+            // Câmera estilo Need for Speed (atrás do carro)
+            const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, BABYLON.Vector3.Zero(), scene);
+            camera.attachControl(canvas, true);
+
+            // Luzes básicas
+            const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+            light.intensity = 0.7;
+
+            // Criar um chão temporário (Grid) para saberes onde estás
+            const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 100, height: 100}, scene);
+            const groundMaterial = new BABYLON.StandardMaterial("groundMat", scene);
+            groundMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+            groundMaterial.wireframe = true; // Estilo "tron" inicial
+            ground.material = groundMaterial;
+
+            // MENSAGEM DE BOAS-VINDAS (UI)
+            const adt = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+            const text = new BABYLON.GUI.TextBlock();
+            text.text = "THE PILOT: PROJETO INICIADO";
+            text.color = "cyan";
+            text.fontSize = 24;
+            text.top = "-40%"; // No topo da tela
+            adt.addControl(text);
+
+            return scene;
+        };
+
+        const scene = createScene();
+
+        // Loop de renderização (mantém o jogo a rodar)
+        engine.runRenderLoop(function () {
+            scene.render();
+        });
+
+        // Ajusta o tamanho se a janela mudar
+        window.addEventListener("resize", function () {
+            engine.resize();
+        });
+    </script>
+</body>
+</html>
